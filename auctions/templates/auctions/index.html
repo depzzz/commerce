@@ -6,15 +6,14 @@
     <ul>
         {% for listing in listings %}
             <li>
-                Title: {{ listing.title }}<br>
+                <a href="{% url 'view' listing.id %}">Title: {{ listing.title }}</a><br>
                 Description: {{ listing.description }}<br>
-                Starting Price: {{ listing.starting_price }}<br>
+                Starting Price: {{ listing.current_price }}<br>
                 Image: <img src="{{ listing.image_url }}" alt="image"><br>
                 Category: {{ listing.category }}<br>
                 Status: {{ listing.status }}<br>
                 Added On: {{ listing.added_on }}<br>
                 Owner: {{ listing.owner }}<br>
-                Listing ID: {{ listing.id }}<br>
             </li>
         {% endfor %}
     </ul>

@@ -1,0 +1,60 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+        {% if message_for_winner|length > 0 %}
+            {{ message_for_winner }}
+        {% endif %}
+    <ul>
+        <li>Listing ID: {{ listing.id }}</li>
+        <li>Title: {{ listing.title }}</li>
+        <li>Description: {{ listing.description }}</li>
+        <li>Current Bid Price: {{ listing.current_price }}</li>
+        <li>Image: <img src="{{ listing.image_url }}" alt="image"></li>
+        <li>Category: {{ listing.category }}</li>
+        <li>Status: {{ listing.status }}</li>
+        <li>Added On: {{ listing.added_on }}</li>
+        <li>Owner: {{ listing.owner }}</li>
+    </ul>
+    {% if user.is_authenticated %}
+        <a href="{% url 'watchlist' listing.id %}" method="post">{{ add_or_remove }}</a>
+
+        <!-- Display Error Message If Exists -->
+        {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+
+        <form method="POST" action="{% url 'view' listing.id %}">
+            {% csrf_token %}
+            {{ BidForm }}
+            <input type="submit" value="Bid Now">
+        </form>
+
+        {% if close_bid|length > 0 %}
+            <a href="{% url 'close' listing.id %}">{{ close_bid }}</a>
+        {% endif %}
+        
+        <form method="POST" action="{% url 'comment' listing.id %}">
+            {% csrf_token %}
+            {{ CommentForm }}
+            <input type="submit" value="Add a Comment">
+        </form>
+
+    {% else %}
+        <div class="message">
+            {{ message }}
+        </div>
+    {% endif %}
+
+    {% if all_comments %}
+    <h3>Comments</h3>
+    <ul>
+        {% for comment in all_comments %}
+            <li>{{ comment.comment }} by {{ comment.user.username }} at {{ comment.added_on }} </li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+{% endblock %}

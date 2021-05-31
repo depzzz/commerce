@@ -24,8 +24,8 @@ CATEGORIES = (
 class listings(models.Model):
     title = models.CharField(max_length=64)
     description = models.CharField(max_length=250)
-    owner = models.CharField(max_length=64)
-    starting_price = models.PositiveIntegerField()
+    owner = models.ForeignKey(User,on_delete=models.CASCADE,related_name="listings")
+    current_price = models.PositiveIntegerField()
     image_url = models.URLField(max_length=200)
 
     category = models.CharField(max_length=13,
@@ -40,30 +40,29 @@ class listings(models.Model):
 
 # Model For Bids Placement (Place Bid)
 class bids(models.Model):
-    user = models.CharField(max_length=64)
-    listingid = models.PositiveIntegerField()
-    title = models.CharField(max_length=64)
+    user = models.ForeignKey(User,on_delete=models.CASCADE,related_name="bids")
+    listingid = models.ForeignKey(listings,on_delete=models.CASCADE,related_name="bidders")
     bid_amount = models.PositiveIntegerField()
     last_modified = models.DateTimeField(auto_now=True)
 
 # Model For User Comments (Add a Comment)
 class comments(models.Model):
-    user = models.CharField(max_length=64)
-    listingid = models.PositiveIntegerField()
+    user = models.ForeignKey(User,on_delete=models.CASCADE,related_name="comments")
+    listingid = models.ForeignKey(listings,on_delete=models.CASCADE,related_name="commenters")
     comment = models.CharField(max_length=500)
     added_on = models.DateTimeField(auto_now_add=True)
 
 # Model For User Watchlist (Add to Watchlist)
 class watchlist(models.Model):
-    user = models.CharField(max_length=64)
-    listingid = models.PositiveIntegerField()
+    user = models.ForeignKey(User,on_delete=models.CASCADE,related_name="watchlist")
+    listingid = models.ForeignKey(listings,on_delete=models.CASCADE,related_name="watchers")
     added_on = models.DateTimeField(auto_now_add=True)
 
 # Model For Winner
 class winner(models.Model):
-    winner = models.CharField(max_length=64)
-    owner = models.CharField(max_length=64)
-    listingid = models.PositiveIntegerField()
+    winner = models.ForeignKey(User,on_delete=models.CASCADE,related_name="wins")
+    owner = models.ForeignKey(User,on_delete=models.CASCADE,related_name="closed")
+    listingid = models.ForeignKey(listings,on_delete=models.CASCADE,related_name="winner")
     title = models.CharField(max_length=64)
     bid_amount = models.PositiveIntegerField()
     timestamp = models.DateTimeField(auto_now_add=True)
