@@ -334,3 +334,29 @@ def view_watchlist(request):
     }
 
     return render(request, 'auctions/watchlist.html', context)
+
+# shows the list of categories that the user can browse
+def categories(request):
+
+    # Get All Category Names from CATEGORIES (a list of tuples)
+    all_categories = [x[0] for x in CATEGORIES]
+
+    # render template
+    context = {
+        "categories" : all_categories,
+    }
+
+    return render(request, 'auctions/categories.html', context)
+
+# category page, shows the user the category
+def category_page(request,category):
+
+    # Get all the listings belonging to a certain category
+    categorized_listings = listings.objects.filter(category=category)
+
+    # render template
+    context = {
+        "categorized_listings" : categorized_listings,
+        "category" : category
+    }
+    return render(request, "auctions/category.html", context)

@@ -1,0 +1,20 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h2>{{ category }}</h2>
+    
+    <ul>
+        {% for listing in categorized_listings %}
+            <li>
+                <a href="{% url 'view' listing.id %}">Title: {{ listing.title }}</a><br>
+                Description: {{ listing.description }}<br>
+                Starting Price: {{ listing.current_price }}<br>
+                Image: <img src="{{ listing.image_url }}" alt="image"><br>
+                Category: {{ listing.category }}<br>
+                Status: {{ listing.status }}<br>
+                Added On: {{ listing.added_on }}<br>
+                Owner: {{ listing.owner }}<br>
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}
