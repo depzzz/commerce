@@ -271,7 +271,7 @@ def close_listing(request,id):
     if current_user == current_listing.owner:
         current_listing.status = 'C'
         current_listing.save()
-
+    
         # add the data of the winner to the winners table
         listing_winner = User.objects.get(pk=bids.objects.filter(listingid=current_listing.id).last().user.id)
 
@@ -285,8 +285,7 @@ def close_listing(request,id):
                             title=title,
                             bid_amount=bid_amount)
         new_winner.save()
-
-        return redirect('index')
+        return redirect('view',id)
 
 @login_required(login_url='login')
 def add_comment(request,id):
@@ -300,22 +299,38 @@ def add_comment(request,id):
         # Add a Comment to the Current Listing Page
         form = CommentForm(request.POST)
 
-        # Get Data From Form & Check whether it is valid 
+        # Get Data From CommentForm Present in listing.html & Check whether it is valid 
         if form.is_valid():
             add_comment = form.cleaned_data['comment']
 
-            # insert the data into listings table
+            # insert the data into comments table
             new_comment = comments(user=current_user,
                                 listingid=current_listing,
                                 comment=add_comment)
             new_comment.save()
 
-            # go back to the listing page and 
-            # show an alert that the listing was added successfully
             return redirect('view',id)
         else:
-            # show validation errors of forms
             # show validation errors of forms
             messages.warning(request, 'The Comment Field Cannot be Empty')
             return redirect('view',id)
             
+# shows the user their watchlist
+@login_required(login_url='login')
+def view_watchlist(request):
+    # define current user
+    current_user = User.objects.get(pk=request.user.id)
+
+    # retrive user added listings from watchlist 
+    # objects.filter always returns a queryset
+    listing_ids = watchlist.objects.filter(user=current_user).values('listingid')
+    
+    # get listind data from queryset 
+    items = listings.objects.filter(id__in=listing_ids)
+
+    # render template
+    context = {
+        "items" : items
+    }
+
+    return render(request, 'auctions/watchlist.html', context)

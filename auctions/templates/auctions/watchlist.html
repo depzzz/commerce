@@ -1,0 +1,22 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h2>Your Watchlist</h2>
+    
+    <ul>
+        {% for listing in items %}
+            <li>
+                <a href="{% url 'view' listing.id %}">Title: {{ listing.title }}</a><br>
+                Description: {{ listing.description }}<br>
+                Starting Price: {{ listing.current_price }}<br>
+                Image: <img src="{{ listing.image_url }}" alt="image"><br>
+                Category: {{ listing.category }}<br>
+                Status: {{ listing.status }}<br>
+                Added On: {{ listing.added_on }}<br>
+                Owner: {{ listing.owner }}<br>
+            </li>
+        {% empty %}
+            <p>Your Watchlist is Empty! Add some listings to keep an 👁</p>
+        {% endfor %}
+    </ul>
+{% endblock %}
