@@ -27,7 +27,7 @@ class CreateForm(forms.Form):
     category = forms.ChoiceField(
         label='Choose a Category',
         choices= CATEGORIES,
-        widget= forms.RadioSelect
+        widget= forms.Select
     )
 
 # form for bidding
@@ -38,7 +38,6 @@ class BidForm(forms.Form):
 # form for adding a comment
 class CommentForm(forms.Form):
     comment = forms.CharField(label='Comment',
-                            widget=forms.Textarea,
                             required=True)
     
 
@@ -47,6 +46,12 @@ def index(request):
     # Get active listings from the listings table
     context = {"listings": listings.objects.filter(status='O')}
     return render(request, "auctions/index.html",context)
+
+# default route inactive for showing all the inactive listings
+def inactive(request):
+    # Get inactive listings from the listings table
+    context = {"listings": listings.objects.filter(status='C')}
+    return render(request, "auctions/inactive.html",context)
 
 # login page route
 def login_view(request):
@@ -140,26 +145,57 @@ def view_listing(request,id):
     # define current listing
     current_listing = listings.objects.get(pk=id)
 
-    if request.user.is_authenticated:
-        # define current user
-        current_user = User.objects.get(pk=request.user.id)
+    if not request.user.is_authenticated:
+        # if user is not authenticated, show them a message asking them to login
+        message = "Create an Account to Start Bidding"
 
         # get listing comments
         all_comments = comments.objects.filter(listingid=current_listing)
 
-        # check if the current listing is closed
-        if current_listing.status == 'C':
-            # get the current listing winner
-            listing_winner = User.objects.get(pk=winner.objects.get(listingid=current_listing).winner.id)
-        else:
-            listing_winner = ''
+        context = {
+                "listing": listings.objects.get(pk=id),
+                "message" : message,
+                "all_comments" : all_comments
+            }
+        return render(request, "auctions/listing.html",context)
 
-        # check if the current user is the listing winner
-        if current_user == listing_winner:
-            message_for_winner = "Congratulations! You are the winner of this bid."
-        else:
-            message_for_winner = ''
+    # define current user
+    current_user = User.objects.get(pk=request.user.id)
 
+    # get listing comments
+    all_comments = comments.objects.filter(listingid=current_listing)
+
+    if current_listing.status == 'C':
+        # get the current listing winner
+        listing_winner = current_listing.winner
+    else:
+        listing_winner = ''
+
+    # check if the user is authenticated & listing is closed
+    if request.user.is_authenticated and current_listing.status == 'C' and current_user != listing_winner:
+
+        context = {
+                "listing": listings.objects.get(pk=id),
+                "all_comments" : all_comments,
+                "winner" : listing_winner
+            }
+
+        return render(request, "auctions/listing.html",context)
+
+    elif current_user == listing_winner:
+        message_for_winner = "Congratulations! You are the winner of this bid."
+
+        context = {
+            "listing": listings.objects.get(pk=id),
+            "all_comments" : all_comments,
+            "message_for_winner" : message_for_winner,
+            "winner" : listing_winner
+        }
+
+        return render(request, "auctions/listing.html",context)
+
+    # if the user is authenticated
+    else:
         # dealing with bids that the user makes
         form = BidForm(request.POST)
         if form.is_valid():
@@ -194,44 +230,19 @@ def view_listing(request,id):
         # if not, then show "Add to Watchlist" Option
         if not already_exists:
             add_or_remove = "Add To Watchlist"
-            context = {
-                "listing": listings.objects.get(pk=id),
-                "add_or_remove" : add_or_remove,
-                "BidForm" : BidForm,
-                "close_bid" : close_bid,
-                "message_for_winner" : message_for_winner,
-                "CommentForm" : CommentForm,
-                "all_comments" : all_comments
-            }
-            return render(request, "auctions/listing.html",context)
-
-        # if so, then show "Remove From Watchlist" Option
         else:
             add_or_remove = "Remove From Watchlist"
-            context = {
-                "listing": listings.objects.get(pk=id),
-                "add_or_remove" : add_or_remove,
-                "BidForm" : BidForm,
-                "close_bid" : close_bid,
-                "message_for_winner" : message_for_winner,
-                "CommentForm" : CommentForm,
-                "all_comments" : all_comments
-            }
-            return render(request, "auctions/listing.html",context)
-    else:
-        # if user is not authenticated, show them a message asking them to login
-        message = "Create an Accuont to Start Bidding"
-
-        # get listing comments
-        all_comments = comments.objects.filter(listingid=current_listing)
-
-        context = {
-                "listing": listings.objects.get(pk=id),
-                "message" : message,
-                "all_comments" : all_comments
-            }
-        return render(request, "auctions/listing.html",context)
         
+        context = {
+            "listing": listings.objects.get(pk=id),
+            "add_or_remove" : add_or_remove,
+            "BidForm" : BidForm,
+            "close_bid" : close_bid,
+            "CommentForm" : CommentForm,
+            "all_comments" : all_comments,
+            "winner" : listing_winner
+        }
+        return render(request, "auctions/listing.html",context)
 
 # lets the user add a listing to their watchlist
 @login_required(login_url='login')
@@ -285,6 +296,9 @@ def close_listing(request,id):
                             title=title,
                             bid_amount=bid_amount)
         new_winner.save()
+
+        current_listing.winner = listing_winner
+        current_listing.save()
         return redirect('view',id)
 
 @login_required(login_url='login')
@@ -360,3 +374,39 @@ def category_page(request,category):
         "category" : category
     }
     return render(request, "auctions/category.html", context)
+
+@login_required(login_url='login')
+def my_wins(request):
+    # define current user
+    current_user = User.objects.get(pk=request.user.id)
+
+    # Get the listings that the user won
+    listing_ids = winner.objects.filter(winner=current_user).values('listingid')
+
+    # get listind data from queryset 
+    items = listings.objects.filter(id__in=listing_ids)
+    
+    # render template
+    context = {
+        "items" : items
+    }
+
+    return render(request, 'auctions/mywins.html', context)
+
+@login_required(login_url='login')
+def my_listings(request):
+    # define current user
+    current_user = User.objects.get(pk=request.user.id)
+
+    # Get the listings that the user won
+    listing_ids = listings.objects.filter(owner=current_user).values('id')
+
+    # get listind data from queryset 
+    items = listings.objects.filter(id__in=listing_ids)
+    
+    # render template
+    context = {
+        "items" : items
+    }
+
+    return render(request, 'auctions/mylistings.html', context)

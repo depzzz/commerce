@@ -1,18 +1,56 @@
 {% extends "auctions/layout.html" %}
 
-{% block body %}
+{% block title %}
+    Create a Listing
+{% endblock %}
+
+{% block heading %}
+    Create a Listing
+{% endblock %}
+
+{% block section %}
     <!-- Display Error Message If Exists -->
     {% if messages %}
+    <blockquote>
     <ul class="messages">
         {% for message in messages %}
         <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
         {% endfor %}
     </ul>
+    </blockquote>
     {% endif %}
 
     <form method="post" href="{% url 'create' %}">
         {% csrf_token %}
-        {{ CreateForm }}
-        <input type="submit" value="Create Listing">
+        <div class="row gtr-uniform">
+            <div class="col-6 col-12-xsmall">
+                <label for="title">Title</label>
+                {{ CreateForm.title }}
+            </div>
+            <div class="col-6 col-12-xsmall">
+                <label for="description">Description</label>
+                {{ CreateForm.description }}
+            </div>
+            <div class="col-6 col-12-xsmall">
+                <label for="starting_price">Starting Price</label>
+                {{ CreateForm.starting_price }}
+            </div>
+            <div class="col-6 col-12-xsmall">
+                <label for="image_url">Image URL</label>
+                {{ CreateForm.image_url }}
+            </div>
+            <div class="col-6">
+                <label for="category">Category</label>
+                {{ CreateForm.category }}
+            </div>
+
+            <div class="col-12">
+                <ul class="actions">
+                    <li><input type="submit" value="Create Listing" class="primary" /></li>
+                    <li><input type="reset" value="Reset" /></li>
+                </ul>
+            </div>
+        </div>
     </form>
+
 {% endblock %}

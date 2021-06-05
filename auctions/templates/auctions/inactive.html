@@ -1,0 +1,44 @@
+{% extends "auctions/layout.html" %}
+
+{% block title %}
+    Inactive Listings
+{% endblock %}
+
+{% block heading %}
+    Inactive Listings
+{% endblock %}
+
+{% block section %}
+    <section class="tiles">
+        {% for listing in listings %}
+            <article class="style1">
+                <span class="image">
+                    <img src="{{ listing.image_url }}" alt="" style="object-fit: cover;" />
+                </span>
+                <a href="{% url 'view' listing.id %}">
+                    <p>
+                        In {{ listing.get_category_display }}
+                    </p>
+                    <h2>{{ listing.title }}</h2>
+                    <div class="content">
+                        <p>
+                            Price: {{ listing.current_price }}
+                            <br />
+                            {{ listing.description|truncatewords:15 }}
+                            <br />
+                            Added By: {{ listing.owner }}
+                            <br />
+                            Added On: {{ listing.added_on }}
+                        </p>
+                    </div>
+                </a>
+            </article>
+        
+        {% empty %}
+        </section>
+        <blockquote>
+            Its Empty Out here ~^^
+        </blockquote>
+        {% endfor %}
+    </section>
+{% endblock %}

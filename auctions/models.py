@@ -37,6 +37,7 @@ class listings(models.Model):
                             default='O')
     
     added_on = models.DateTimeField(auto_now_add=True)
+    winner = models.ForeignKey(User,on_delete=models.CASCADE,related_name="winner",blank=True,null=True)
 
 # Model For Bids Placement (Place Bid)
 class bids(models.Model):
@@ -62,7 +63,7 @@ class watchlist(models.Model):
 class winner(models.Model):
     winner = models.ForeignKey(User,on_delete=models.CASCADE,related_name="wins")
     owner = models.ForeignKey(User,on_delete=models.CASCADE,related_name="closed")
-    listingid = models.ForeignKey(listings,on_delete=models.CASCADE,related_name="winner")
+    listingid = models.ForeignKey(listings,on_delete=models.CASCADE,related_name="listing_winner")
     title = models.CharField(max_length=64)
     bid_amount = models.PositiveIntegerField()
     timestamp = models.DateTimeField(auto_now_add=True)

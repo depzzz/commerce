@@ -3,7 +3,7 @@ from .models import User, listings, bids, comments, watchlist, winner
 
 #For the sake of showing readonly_fields into django admin interface
 class listingsread(admin.ModelAdmin):
-    fields = ['id', 'title', 'description', 'owner', 'current_price', 'image_url', 'category', 'status', 'added_on']
+    fields = ['id', 'title', 'description', 'owner', 'current_price', 'image_url', 'category', 'status', 'added_on', 'winner']
     readonly_fields = ['added_on','id']
 
 class bidsread(admin.ModelAdmin):

@@ -3,47 +3,107 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <title>{% block title %}Auctions{% endblock %}</title>
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-        <link href="{% static 'auctions/styles.css' %}" rel="stylesheet">
-    </head>
-    <body>
-        <h1>Auctions</h1>
-        <div>
-            {% if user.is_authenticated %}
-                Signed in as <strong>{{ user.username }}</strong>.
-            {% else %}
-                Not signed in.
-            {% endif %}
-        </div>
-        <ul class="nav">
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'index' %}">Active Listings</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'categories' %}">Categories</a>
-            </li>
-            {% if user.is_authenticated %}
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'create' %}">Create Listing</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'view_watchlist' %}">Watchlist</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'logout' %}">Log Out</a>
-                </li>
-            {% else %}
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'login' %}">Log In</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'register' %}">Register</a>
-                </li>
-            {% endif %}
-        </ul>
-        <hr>
-        {% block body %}
-        {% endblock %}
-    </body>
+		<title>{% block title %}Auctions{% endblock %}</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="{% static 'auctions/css/main.css' %}" />
+		<noscript>
+            <link rel="stylesheet" href="{% static 'auctions/css/noscript.css' %}" />
+        </noscript>
+	</head>
+    <body class="is-preload">
+        <!-- Wrapper -->
+        <div id="wrapper">
+            <!-- Header -->
+            <header id="header">
+                <div class="inner">
+
+                    <!-- Logo -->
+                        <a href="{% url 'index' %}" class="logo">
+                            <span class="symbol">
+                                <img src="{% static 'auctions/images/logo.svg' %}" alt="" />
+                            </span>
+                            <span class="title">
+                                Auctions &rarr;&nbsp;
+                                <a href="{{ request.get_full_path }}" class="logo">
+                                    {% block heading %}{% endblock %}
+                                </a>
+                            </span>
+                        </a>
+
+                    <!-- Nav -->
+                        <nav>
+                            <ul>
+                                <li><a href="#menu">Menu</a></li>
+                            </ul>
+                        </nav>
+
+                </div>
+            </header>
+            <!-- Header Ends -->
+
+            <!-- Menu -->
+            <nav id="menu">
+                <h2>Menu</h2>
+                <ul>
+                    <li><a href="{% url 'index' %}">Active Listings</a></li>
+                    <li><a href="{% url 'inactive' %}">Inactive Listings</a></li>
+                    <li><a href="{% url 'categories' %}">Categories</a></li>
+                    {% if user.is_authenticated %}
+                        <li><a href="{% url 'create' %}">Create Listing</a></li>
+                        <li><a href="{% url 'view_watchlist' %}">Watchlist</a></li>
+                        <li><a href="{% url 'mywins' %}">My Wins</a></li>
+                        <li><a href="{% url 'mylistings' %}">My Listings</a></li>
+                        <li><a href="{% url 'logout' %}">Logout</a></li>
+                    {% else %}
+                        <li><a href="{% url 'login' %}">Login</a></li>
+                        <li><a href="{% url 'register' %}">Register</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+            <!-- Menu End -->
+
+            <!-- Main -->
+			<div id="main">
+				<div class="inner">
+                    <header>
+                        <h1>
+                        {% if user.is_authenticated %}
+                            Hello {{ user.username }}, Welcome to Auctions. <br />
+                            Participate in Amazing Bids or <a href="{% url 'create' %}">Create a Listing</a>.
+                        {% else %}
+                            Hello Guest, Welcome to Auctions. <br />
+                            <a href="{% url 'register' %}">Sign Up</a> or <a href="{% url 'login' %}">Log In</a>
+                        {% endif %}
+                        </h1>
+                        <p>An eBay-like e-commerce auction site that will allow users to post auction listings, place bids on listings, comment on those listings, and add listings to a “watchlist.”</p>
+                    </header>
+                        {% block section %}
+                        {% endblock %}
+
+                        {% block para %}
+                        {% endblock %}
+                </div>
+            </div>
+            <!-- Main Ends-->
+
+            <!-- Footer -->
+            <footer id="footer">
+                <div class="inner">
+                    <ul class="copyright">
+                        <li>&copy; Created by <a href="http://github.com/depzzz/">Depzzz</a></li><li>Template By: <a href="http://html5up.net">HTML5 UP</a></li>
+                    </ul>
+                </div>
+            </footer>
+            <!-- Footer Ends -->
+        </div> 
+
+        <!-- Scripts -->
+			<script src="{% static 'auctions/js/jquery.min.js' %}"></script>
+			<script src="{% static 'auctions/js/browser.min.js' %}"></script>
+			<script src="{% static 'auctions/js/breakpoints.min.js' %}"></script>
+			<script src="{% static 'auctions/js/util.js' %}"></script>
+			<script src="{% static 'auctions/js/main.js' %}"></script>
+        <!-- Scripts End -->
+	</body>
 </html>
