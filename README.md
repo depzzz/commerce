@@ -1,7 +1,8 @@
-# commerce
+# Commerce
 ### Project 2 for CS50 Web - Commerce (E-bay Like Auction Site)
 
 STATUS: **Completed** :octocat:
+
 TIME TAKEN: 1 Week
 
 PROJECT SPECIFICATION @ [CS50w](https://cs50.harvard.edu/web/2020/projects/2/commerce)
